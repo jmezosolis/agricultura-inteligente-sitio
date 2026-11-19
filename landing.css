@@ -1282,3 +1282,9 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 /* Cómo funciona: texto más arriba en las bandas */
 #como-funciona .como-banda { padding-top: 48px; padding-bottom: 80px; }
 #como-funciona .como-banda .como-grid > div:first-child { margin-top: 0; }
+
+/* Celular: al abrir el menú, la lista baja en su propia fila y no se superpone con el nombre */
+@media (max-width: 760px) {
+  .franja-fila:has(nav.nav-texto.abierto) { flex-wrap: wrap; }
+  .franja-top nav.nav-texto.abierto { order: 3; flex: 0 0 100%; width: 100%; }
+}
