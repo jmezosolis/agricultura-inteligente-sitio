@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="supabase-key" content="sb_publishable_bXIMHv6T-mVyyswqv1NL1Q_tD-ghmNl">
   <meta name="theme-color" content="#070A11">
   <meta name="description" content="Detección de plantas y enfermedades con inteligencia artificial, y asistente para tus preguntas de cultivos.">
   <title>Detección con IA</title>
@@ -75,7 +76,9 @@
 
   <script>
     (function () {
-      var PENDIENTE = 'El servicio de inteligencia artificial todavía no está conectado. Cuando se conecte, aquí aparecerá el resultado.';
+      var URL_FUNCION = 'https://krmzykgzmcgnjvsicaaq.supabase.co/functions/v1/ia-analisis';
+      var CLAVE_PUBLICA = document.querySelector('meta[name="supabase-key"]').content;
+
       var foto = document.getElementById('foto');
       var vista = document.getElementById('vista');
       var analizar = document.getElementById('analizar');
@@ -85,6 +88,42 @@
       var estadoPregunta = document.getElementById('estado-pregunta');
       var url = null;
 
+      function llamar(cuerpo) {
+        return fetch(URL_FUNCION, {
+          method: 'POST',
+          headers: { apikey: CLAVE_PUBLICA, Authorization: 'Bearer ' + CLAVE_PUBLICA, 'Content-Type': 'application/json' },
+          body: JSON.stringify(cuerpo)
+        }).then(function (r) { if (!r.ok) throw new Error('estado ' + r.status); return r.json(); });
+      }
+
+      function escapar(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+      function pintar(contenedor, respuestaTexto) {
+        var datos;
+        try { datos = JSON.parse(respuestaTexto); } catch (e) { datos = null; }
+        if (!datos) { contenedor.innerHTML = '<div class="tarjeta"><p>' + escapar(respuestaTexto) + '</p></div>'; return; }
+        var acciones = (datos.acciones || []).map(function (a) { return '<li>' + escapar(a) + '</li>'; }).join('');
+        contenedor.innerHTML =
+          '<div class="tarjeta"><h3>Diagnóstico</h3><p>' + escapar(datos.diagnostico || '') + '</p>' +
+          '<p><strong>Confianza:</strong> ' + escapar(datos.confianza || '') + ' · <strong>Prioridad:</strong> ' + escapar(datos.prioridad || '') + '</p>' +
+          (acciones ? '<h3>Acciones recomendadas</h3><ul>' + acciones + '</ul>' : '') +
+          '<p class="aviso">' + escapar(datos.aviso || '') + '</p></div>';
+      }
+
+      var resultado = document.createElement('section');
+      resultado.id = 'resultado';
+      resultado.setAttribute('aria-live', 'polite');
+      document.querySelector('main').appendChild(resultado);
+
+      function leerComoBase64(archivo) {
+        return new Promise(function (resolver, rechazar) {
+          var lector = new FileReader();
+          lector.onload = function () { resolver(String(lector.result).split(',')[1]); };
+          lector.onerror = rechazar;
+          lector.readAsDataURL(archivo);
+        });
+      }
+
       foto.addEventListener('change', function () {
         var archivo = foto.files && foto.files[0];
         if (url) { URL.revokeObjectURL(url); url = null; }
@@ -92,13 +131,39 @@
         url = URL.createObjectURL(archivo);
         vista.src = url; vista.hidden = false; analizar.disabled = false; estadoFoto.textContent = '';
       });
+
       document.getElementById('form-foto').addEventListener('submit', function (e) {
-        e.preventDefault(); estadoFoto.textContent = PENDIENTE;
+        e.preventDefault();
+        var archivo = foto.files && foto.files[0];
+        if (!archivo) return;
+        var tipo = document.querySelector('input[name="tipo"]:checked').value;
+        var instruccion = tipo === 'enfermedad'
+          ? 'Revisa si la planta de la foto tiene una enfermedad o plaga. Responde en el formato JSON indicado.'
+          : 'Identifica la planta o el cultivo de la foto. Responde en el formato JSON indicado.';
+        analizar.disabled = true; estadoFoto.textContent = 'Analizando la foto…'; resultado.innerHTML = '';
+        leerComoBase64(archivo).then(function (b64) {
+          return llamar({ pregunta: instruccion, imagenBase64: b64, tipoImagen: archivo.type || 'image/jpeg' });
+        }).then(function (datos) {
+          estadoFoto.textContent = '';
+          pintar(resultado, datos.respuesta || '');
+        }).catch(function () {
+          estadoFoto.textContent = 'No pudimos analizar la foto. Intenta de nuevo más tarde.';
+        }).finally(function () { analizar.disabled = false; });
       });
 
       pregunta.addEventListener('input', function () { preguntar.disabled = pregunta.value.trim().length === 0; });
+
       document.getElementById('form-pregunta').addEventListener('submit', function (e) {
-        e.preventDefault(); estadoPregunta.textContent = PENDIENTE;
+        e.preventDefault();
+        var texto = pregunta.value.trim();
+        if (!texto) return;
+        preguntar.disabled = true; estadoPregunta.textContent = 'Consultando…'; resultado.innerHTML = '';
+        llamar({ pregunta: texto + ' Responde en el formato JSON indicado.' }).then(function (datos) {
+          estadoPregunta.textContent = '';
+          pintar(resultado, datos.respuesta || '');
+        }).catch(function () {
+          estadoPregunta.textContent = 'No pudimos responder. Intenta de nuevo más tarde.';
+        }).finally(function () { preguntar.disabled = pregunta.value.trim().length === 0; });
       });
     })();
   </script>
