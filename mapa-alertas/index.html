@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070A11">
+  <meta name="description" content="Mapa de alertas: incendios, clima extremo y vista satelital de tu zona.">
+  <title>Mapa de alertas</title>
+  <link rel="manifest" href="../movil/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="../movil/icon-192.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <style>
+    :root { --fondo: #070A11; --tarjeta: #0D1322; --borde: #1E293B; --neon: #00FF9D; --naranja: #FF6B00; --rojo: #EF4444; --amarillo: #FACC15; --texto: #E2E8F0; --texto-suave: #94A3B8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--fondo); color: var(--texto); font-family: Inter, system-ui, sans-serif; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: #0D1322; border-bottom: 1px solid var(--borde); }
+    header a, header button { color: #fff; background: #111A2E; border: 1px solid #2A3B5C; border-radius: 10px; padding: 8px 12px; text-decoration: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+    header h1 { font-size: 17px; margin: 0; }
+    #mapa { height: 52vh; min-height: 300px; width: 100%; }
+    main { max-width: 640px; margin: 0 auto; padding: 14px 16px 40px; display: grid; gap: 12px; }
+    .capas { display: flex; gap: 8px; flex-wrap: wrap; }
+    .capas button { background: #111A2E; color: var(--texto); border: 1px solid #2A3B5C; border-radius: 999px; padding: 7px 12px; font-size: 13px; cursor: pointer; }
+    .capas button[aria-pressed="true"] { background: var(--neon); color: #03130C; border-color: var(--neon); font-weight: 700; }
+    .tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 14px; padding: 14px 16px; }
+    .tarjeta h2 { font-size: 16px; margin: 0 0 6px; }
+    .tarjeta p { margin: 4px 0; color: var(--texto-suave); font-size: 14px; line-height: 1.5; }
+    .alerta { border-left: 4px solid var(--amarillo); }
+    .alerta.alta { border-left-color: var(--rojo); }
+    .alerta.ok { border-left-color: var(--neon); }
+    .aviso { font-size: 12px; color: var(--texto-suave); }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../movil/index.html">← Apps</a>
+    <h1>Mapa de alertas</h1>
+    <button type="button" id="ubicarme">Mi ubicación</button>
+  </header>
+
+  <div id="mapa" role="application" aria-label="Mapa de alertas"></div>
+
+  <main>
+    <div class="capas" role="group" aria-label="Capas del mapa">
+      <button type="button" data-base="satelite" aria-pressed="true">Satélite</button>
+      <button type="button" data-base="calles" aria-pressed="false">Calles</button>
+    </div>
+
+    <section class="tarjeta" id="resumen">
+      <h2>Toca el mapa para consultar una zona</h2>
+      <p>Se revisan los incendios cercanos (radio de 5 km) y el clima de los próximos 3 días en el punto que elijas.</p>
+    </section>
+
+    <section id="alertas" aria-live="polite"></section>
+
+    <p class="aviso">Los focos de calor son detecciones satelitales (NASA FIRMS). El pronóstico es de Open-Meteo. Esta herramienta es de apoyo: quien la usa decide en campo.</p>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm';
+
+    const URL_PROYECTO = 'https://krmzykgzmcgnjvsicaaq.supabase.co';
+    const CLAVE_PUBLICA = 'sb_publishable_bXIMHv6T-mVyyswqv1NL1Q_tD-ghmNl';
+    const supabase = createClient(URL_PROYECTO, CLAVE_PUBLICA);
+
+    const resumen = document.getElementById('resumen');
+    const alertasEl = document.getElementById('alertas');
+    const escapar = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // Mapa con dos bases: satélite (Esri World Imagery) y calles (OpenStreetMap)
+    const satelite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Imágenes © Esri, Maxar, Earthstar Geographics' });
+    const calles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
+    const mapa = L.map('mapa', { center: [19.4, -99.1], zoom: 6, layers: [satelite] });
+    const bases = { satelite, calles };
+    document.querySelectorAll('[data-base]').forEach((b) => b.addEventListener('click', () => {
+      const elegida = b.dataset.base;
+      Object.values(bases).forEach((capa) => mapa.removeLayer(capa));
+      bases[elegida].addTo(mapa);
+      document.querySelectorAll('[data-base]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    }));
+
+    let marca = null;
+
+    // Umbrales de alerta climática (criterio de esta herramienta)
+    async function consultarClima(lat, lon) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max&timezone=auto&forecast_days=3`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error('clima');
+      const d = (await r.json()).daily;
+      const alertas = [];
+      d.time.forEach((fecha, i) => {
+        if (d.temperature_2m_max[i] >= 35) alertas.push({ nivel: 'alta', texto: `Ola de calor el ${fecha}: máxima de ${d.temperature_2m_max[i]} °C.` });
+        if (d.temperature_2m_min[i] <= 2) alertas.push({ nivel: 'alta', texto: `Riesgo de helada el ${fecha}: mínima de ${d.temperature_2m_min[i]} °C.` });
+        if (d.precipitation_sum[i] >= 30) alertas.push({ nivel: 'alta', texto: `Lluvia intensa el ${fecha}: ${d.precipitation_sum[i]} mm.` });
+        if (d.wind_speed_10m_max[i] >= 50) alertas.push({ nivel: 'alta', texto: `Viento fuerte el ${fecha}: hasta ${d.wind_speed_10m_max[i]} km/h.` });
+      });
+      return alertas;
+    }
+
+    const RADIO_KM = 5;
+    async function consultarFocos(sesion, punto) {
+      const respuesta = await fetch(`${URL_PROYECTO}/functions/v1/incendios`, {
+        method: 'POST',
+        headers: { apikey: CLAVE_PUBLICA, Authorization: `Bearer ${sesion.access_token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ punto, radioKm: RADIO_KM }),
+      });
+      if (!respuesta.ok) throw new Error('incendios');
+      return respuesta.json();
+    }
+
+    function tarjetaIncendios(datos) {
+      if (datos.focos7d > 0) {
+        const cerca = datos.cercano !== undefined ? ` Foco más cercano: ${datos.cercano} km.` : '';
+        return `<article class="tarjeta alerta alta"><h2>Incendios</h2><p>${datos.focos7d} focos de calor en los últimos 7 días dentro de ${RADIO_KM} km.${cerca}</p><p class="aviso">Detección satelital (NASA FIRMS), no un aviso oficial.</p></article>`;
+      }
+      return '<article class="tarjeta alerta ok"><h2>Incendios</h2><p>Sin focos de calor cercanos en los últimos 7 días.</p></article>';
+    }
+
+    mapa.on('click', async (e) => {
+      const { lat, lng } = e.latlng;
+      if (marca) mapa.removeLayer(marca);
+      marca = L.marker([lat, lng]).addTo(mapa);
+      resumen.innerHTML = `<h2>Zona seleccionada</h2><p>${lat.toFixed(4)}, ${lng.toFixed(4)}</p>`;
+      alertasEl.innerHTML = '<p class="aviso">Consultando…</p>';
+
+      const bloques = [];
+      try {
+        const clima = await consultarClima(lat, lng);
+        if (clima.length === 0) bloques.push('<article class="tarjeta alerta ok"><h2>Clima</h2><p>Sin alertas climáticas en los próximos 3 días.</p></article>');
+        clima.forEach((a) => bloques.push(`<article class="tarjeta alerta ${a.nivel}"><h2>Clima</h2><p>${escapar(a.texto)}</p></article>`));
+      } catch (err) {
+        bloques.push('<article class="tarjeta"><h2>Clima</h2><p>No pudimos consultar el clima. Intenta más tarde.</p></article>');
+      }
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        bloques.push('<article class="tarjeta"><h2>Incendios</h2><p>Inicia sesión en la portada para consultar los focos de calor.</p></article>');
+      } else {
+        try {
+          bloques.push(tarjetaIncendios(await consultarFocos(session, [lng, lat])));
+        } catch (err) {
+          bloques.push('<article class="tarjeta"><h2>Incendios</h2><p>No pudimos consultar los focos. Intenta más tarde.</p></article>');
+        }
+      }
+      alertasEl.innerHTML = bloques.join('');
+    });
+
+    document.getElementById('ubicarme').addEventListener('click', () => {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition((p) => mapa.setView([p.coords.latitude, p.coords.longitude], 12));
+    });
+  </script>
+</body>
+</html>

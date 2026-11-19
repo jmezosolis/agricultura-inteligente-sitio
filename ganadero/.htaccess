@@ -1,0 +1,24 @@
+# sw.js decide CÓMO funciona la app sin conexión — es el archivo más
+# importante para que un arreglo llegue a tiempo a los clientes. Muchos
+# hostings (confirmado en Hostinger, con Planificador de Potreros, y de
+# nuevo acá: styles.css quedó sirviendo una copia de ~23hs por el CDN
+# "hcdn" propio de Hostinger — x-hcdn-cache-status: HIT — después de subir
+# un cambio de paleta) lo sirven por defecto con "Cache-Control: public,
+# max-age=604800" (7 días), igual que cualquier .css/.js estático. Eso
+# significa que aunque subas un archivo corregido, tanto el navegador de
+# quien ya instaló la app COMO el CDN de Hostinger pueden seguir sirviendo
+# la copia vieja hasta una semana entera, sin enterarse de que hay una
+# nueva. "no-cache" no significa "no guardar nada": fuerza a que se
+# revalide siempre contra el origen (con ETag/Last-Modified, sigue siendo
+# barato) antes de confiar en la copia guardada — tanto a nivel navegador
+# como, si el CDN respeta el header del origen (como acá), a nivel CDN.
+#
+# sw.js es el más crítico (decide el offline de todos), pero se extiende a
+# todo lo que cambia seguido en esta app: el propio HTML, el JS de la
+# interfaz y el CSS. Los íconos y el manifest no están acá a propósito —
+# esos sí conviene que el CDN los cachee fuerte, cambian poquísimo.
+<IfModule mod_headers.c>
+  <FilesMatch "^(sw\.js|index\.html|app\.js|styles\.css)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

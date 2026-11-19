@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070A11">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Agricultura inteligente</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <style>
+    :root { --fondo: #070A11; --tarjeta: #0D1322; --tarjeta-2: #111A2E; --borde: #1E293B; --neon: #00FF9D; --naranja: #FF6B00; --texto: #E2E8F0; --texto-suave: #94A3B8; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--fondo); color: var(--texto); font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    body { min-height: 100vh; padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom); }
+    .pantalla { max-width: 460px; margin: 0 auto; min-height: 100vh; display: none; flex-direction: column; justify-content: center; gap: 18px; padding: 32px 0; }
+    .pantalla.activa { display: flex; }
+    .marca { text-align: center; display: grid; gap: 8px; justify-items: center; }
+    .marca img { width: 96px; height: 96px; border-radius: 22px; }
+    .marca h1 { margin: 0; font-family: 'Archivo', system-ui, sans-serif; font-size: 24px; font-weight: 800; }
+    .marca p { margin: 0; color: var(--texto-suave); font-size: 14px; }
+    .titulo { margin: 8px 0 0; font-size: 18px; font-weight: 700; text-align: center; }
+    .boton-app {
+      display: flex; align-items: center; gap: 14px; width: 100%;
+      background: var(--tarjeta); color: var(--texto); border: 1px solid var(--borde);
+      border-radius: 16px; padding: 16px; text-decoration: none; font-size: 16px; font-weight: 700;
+    }
+    .boton-app small { display: block; font-weight: 500; font-size: 13px; color: var(--texto-suave); margin-top: 2px; }
+    .boton-app .ico { width: 44px; height: 44px; border-radius: 12px; background: var(--tarjeta-2); display: grid; place-items: center; flex: 0 0 auto; }
+    .boton-app .ico img { width: 30px; height: 30px; object-fit: contain; }
+    .boton-principal { background: var(--naranja); border: 0; color: #fff; border-radius: 14px; padding: 15px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; }
+    .campo { display: grid; gap: 6px; font-size: 14px; color: var(--texto-suave); }
+    .campo input { background: var(--tarjeta-2); border: 1px solid var(--borde); color: var(--texto); border-radius: 12px; padding: 13px 14px; font-size: 16px; }
+    .aviso { color: var(--naranja); font-size: 14px; text-align: center; min-height: 18px; margin: 0; }
+    .salir { background: none; border: 0; color: var(--texto-suave); text-decoration: underline; font-size: 14px; cursor: pointer; align-self: center; }
+    .carga { text-align: center; color: var(--texto-suave); }
+    .instalar { display: none; background: transparent; border: 1px solid var(--texto-suave); color: #fff; border-radius: 14px; padding: 13px; font-size: 15px; font-weight: 600; width: 100%; cursor: pointer; }
+    .instalar.visible { display: block; }
+    /* Iconos de color: el propio icono sirve de máscara */
+    .mascara { display: block; width: 30px; height: 30px; background: var(--c); -webkit-mask: var(--img) center / contain no-repeat; mask: var(--img) center / contain no-repeat; }
+    /* Agricultura inteligente: dos pastos abajo y el satélite blanco girado */
+    .boton-app .ico .combo-ganader { position: relative; display: block; width: 36px; height: 36px; }
+    .boton-app .ico .combo-ganader .base { position: absolute; left: 0; bottom: -8px; top: auto; width: 56%; height: auto; }
+    .boton-app .ico .combo-ganader .base2 { position: absolute; right: 0; bottom: -8px; top: auto; width: 56%; height: auto; }
+    .boton-app .ico .combo-ganader .maiz { position: absolute; bottom: 0; width: 55%; height: auto; }
+    .boton-app .ico .combo-ganader .b1 { left: 0; }
+    .boton-app .ico .combo-ganader .sat { position: absolute; right: 0; top: 0; width: 52%; height: auto; transform: rotate(180deg); }
+      .oculto { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <section id="pantalla-carga" class="pantalla activa">
+    <p class="carga">Cargando…</p>
+  </section>
+
+  <section id="pantalla-login" class="pantalla">
+    <div class="marca">
+      <img src="./icon-192.png" alt="">
+      <h1>Agricultura inteligente</h1>
+      <p>Inicia sesión para continuar</p>
+    </div>
+    <form id="form-login" class="campo-grupo" style="display:grid;gap:12px">
+      <label class="campo">Correo
+        <input type="email" name="email" autocomplete="email" required>
+      </label>
+      <label class="campo">Contraseña
+        <input type="password" name="password" autocomplete="current-password" required>
+      </label>
+      <p id="aviso-login" class="aviso" role="alert"></p>
+      <button type="submit" class="boton-principal">Entrar</button>
+    </form>
+  </section>
+
+  <section id="pantalla-apps" class="pantalla">
+    <div class="marca">
+      <img src="./icon-192.png" alt="">
+      <h1>Agricultura inteligente</h1>
+    </div>
+    <p class="titulo">¿Qué necesitas hoy?</p>
+    <div style="display:grid;gap:12px">
+      <a class="boton-app" href="../potreros/index.html"><span class="ico"><span class="combo-ganader" aria-hidden="true"><img class="base" src="../assets/cesped.png" alt=""><img class="base2" src="../assets/cesped.png" alt=""><img class="sat" src="../assets/satelite.webp" alt=""><img class="maiz b1" src="../assets/maiz-cultivo.gif" alt=""></span></span><span>Agricultura inteligente<small>Monitoreo de cultivos</small></span></a>
+      <a class="boton-app oculto" id="enlace-ganaid" href="../ganadero/index.html"><span class="ico"><img src="../assets/ganaid-icono-azul.png" alt=""></span><span>Gana ID<small>Trazabilidad con chip</small></span></a>
+      <a class="boton-app oculto" href="../pesaje/index.html"><span class="ico"><img src="../assets/pesaje-icono-rojo.png" alt=""></span><span>Pesaje por imagen<small>Estimación de peso con cámara</small></span></a>
+      <a class="boton-app oculto" href="../huella/index.html"><span class="ico"><img src="../assets/huella-icono-sostenible.png" alt=""></span><span>Huella de carbono<small>Metano y maquinaria del campo</small></span></a>
+      <a class="boton-app" href="../mapa-alertas/index.html"><span class="ico"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" fill="none" stroke="#38BDF8" stroke-width="1.8"/><circle cx="12" cy="10" r="2.5" fill="#38BDF8"/></svg></span><span>Mapa de alertas<small>Clima y vista satelital</small></span></a>
+      <a class="boton-app" href="../deteccion-ia/index.html"><span class="ico"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" fill="none" stroke="#00FF9D" stroke-width="1.8"/><circle cx="12" cy="13" r="3.5" fill="#00FF9D"/></svg></span><span>Detección con IA<small>Plantas, enfermedades y preguntas</small></span></a>
+    </div>
+    <button type="button" id="instalar" class="instalar">Instalar la app en mi celular</button>
+    <button type="button" id="salir" class="salir">Cerrar sesión</button>
+  </section>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm';
+
+    const URL_PROYECTO = 'https://krmzykgzmcgnjvsicaaq.supabase.co';
+    const CLAVE_PUBLICA = 'sb_publishable_bXIMHv6T-mVyyswqv1NL1Q_tD-ghmNl';
+    const supabase = createClient(URL_PROYECTO, CLAVE_PUBLICA);
+
+    const mostrar = (id) => {
+      document.querySelectorAll('.pantalla').forEach((p) => p.classList.toggle('activa', p.id === id));
+    };
+
+    async function iniciar() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) return mostrar('pantalla-login');
+      // Rol: los administradores van al panel de Gana ID de administración.
+      const { data: perfil } = await supabase.from('perfiles').select('rol').eq('id', data.session.user.id).maybeSingle();
+      if (perfil && perfil.rol === 'admin') {
+        document.getElementById('enlace-ganaid').href = '../administracion/index.html';
+      }
+      mostrar('pantalla-apps');
+    }
+
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const aviso = document.getElementById('aviso-login');
+      aviso.textContent = '';
+      const { error } = await supabase.auth.signInWithPassword({ email: String(fd.get('email')).trim(), password: String(fd.get('password')) });
+      if (error) {
+        const m = (error.message || '').toLowerCase();
+        if (m.includes('invalid login')) aviso.textContent = 'Correo o contraseña incorrectos. Revisa que el correo esté bien escrito.';
+        else if (m.includes('not confirmed')) aviso.textContent = 'Tu correo aún no está confirmado. Confírmalo desde el correo de registro.';
+        else if (m.includes('rate limit') || m.includes('too many')) aviso.textContent = 'Demasiados intentos. Espera unos minutos y vuelve a intentar.';
+        else aviso.textContent = 'No pudimos iniciar sesión: ' + error.message;
+        return;
+      }
+      iniciar();
+    });
+
+    document.getElementById('salir').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      mostrar('pantalla-login');
+    });
+
+    // Instalación: esta es la única versión descargable.
+    let eventoInstalar = null;
+    const botonInstalar = document.getElementById('instalar');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      eventoInstalar = e;
+      botonInstalar.classList.add('visible');
+    });
+    window.addEventListener('appinstalled', () => botonInstalar.classList.remove('visible'));
+    botonInstalar.addEventListener('click', async () => {
+      if (!eventoInstalar) return;
+      eventoInstalar.prompt();
+      await eventoInstalar.userChoice;
+      eventoInstalar = null;
+      botonInstalar.classList.remove('visible');
+    });
+
+    iniciar();
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>

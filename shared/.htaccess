@@ -1,0 +1,10 @@
+# Mismo motivo que frontend/ganadero/.htaccess: estos 4 archivos los
+# cargan las 2 apps (ganadero/administracion) y cambian seguido —
+# sin esto, tanto el navegador de cada visitante como el CDN de Hostinger
+# pueden quedarse con una copia vieja hasta 7 días después de subir una
+# corrección.
+<IfModule mod_headers.c>
+  <FilesMatch "^(data\.js|ui-common\.js|view-generic\.js|styles\.css)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

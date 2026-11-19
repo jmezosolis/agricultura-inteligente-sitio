@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070A11">
+  <meta name="description" content="Detección de plantas y enfermedades con inteligencia artificial, y asistente para tus preguntas de cultivos.">
+  <title>Detección con IA</title>
+  <link rel="manifest" href="../movil/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="../movil/icon-192.png">
+  <style>
+    :root { --fondo: #070A11; --tarjeta: #0D1322; --borde: #1E293B; --neon: #00FF9D; --texto: #E2E8F0; --texto-suave: #94A3B8; --azul: #38BDF8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--fondo); color: var(--texto); font-family: Inter, system-ui, sans-serif; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: #0D1322; border-bottom: 1px solid var(--borde); }
+    header a { color: #fff; background: #111A2E; border: 1px solid #2A3B5C; border-radius: 10px; padding: 8px 12px; text-decoration: none; font-size: 14px; font-weight: 600; }
+    header h1 { font-size: 17px; margin: 0; }
+    main { max-width: 640px; margin: 0 auto; padding: 16px 16px 40px; display: grid; gap: 14px; }
+    h2 { font-size: 20px; margin: 4px 0 6px; }
+    .suave { color: var(--texto-suave); font-size: 14px; line-height: 1.5; margin: 0; }
+    .tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+    .tarjeta h3 { font-size: 17px; margin: 0; }
+    fieldset { border: 1px solid var(--borde); border-radius: 12px; padding: 10px 14px; display: flex; gap: 18px; flex-wrap: wrap; }
+    legend { color: var(--texto-suave); font-size: 14px; padding: 0 6px; }
+    label.opcion { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+    label.carga { border: 2px dashed #2A3B5C; border-radius: 14px; padding: 20px; text-align: center; cursor: pointer; color: var(--texto-suave); }
+    label.carga input { display: block; margin: 0 auto 10px; max-width: 100%; }
+    #vista { width: 100%; max-height: 340px; object-fit: contain; border-radius: 12px; }
+    button.boton { background: var(--neon); color: #03130C; border: 0; border-radius: 12px; padding: 13px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    button.boton:disabled { opacity: 0.45; cursor: not-allowed; }
+    textarea { width: 100%; min-height: 96px; background: #0A1020; color: var(--texto); border: 1px solid #2A3B5C; border-radius: 12px; padding: 12px; font: inherit; resize: vertical; }
+    .estado { color: var(--texto-suave); font-size: 14px; min-height: 1.4em; margin: 0; }
+    .aviso { font-size: 12px; color: var(--texto-suave); }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../movil/index.html">← Apps</a>
+    <h1>Detección con IA</h1>
+    <span></span>
+  </header>
+
+  <main>
+    <section class="tarjeta" aria-labelledby="t-detectar">
+      <h2 id="t-detectar">Detecta plantas y enfermedades</h2>
+      <p class="suave">Sube una foto de la planta o de la hoja afectada y la analizaremos con inteligencia artificial.</p>
+      <form id="form-foto" class="tarjeta" style="padding:0;border:0;background:none">
+        <fieldset>
+          <legend>¿Qué quieres detectar?</legend>
+          <label class="opcion"><input type="radio" name="tipo" value="planta" checked> Planta</label>
+          <label class="opcion"><input type="radio" name="tipo" value="enfermedad"> Enfermedad</label>
+        </fieldset>
+        <label class="carga">
+          <input type="file" id="foto" accept="image/*" capture="environment">
+          <span>Elegir o tomar una foto</span>
+        </label>
+        <img id="vista" alt="Vista previa de la foto" hidden>
+        <button type="submit" id="analizar" class="boton" disabled>Analizar con IA</button>
+        <p id="estado-foto" class="estado" role="status"></p>
+      </form>
+    </section>
+
+    <section class="tarjeta" aria-labelledby="t-asistente">
+      <h2 id="t-asistente">Pregúntale a la app</h2>
+      <p class="suave">Escribe una pregunta sobre tus cultivos: manejo del agua, fertilización, plagas o cosecha.</p>
+      <form id="form-pregunta" class="tarjeta" style="padding:0;border:0;background:none">
+        <textarea id="pregunta" placeholder="Ej. ¿Qué puedo hacer para mejorar el agua de mi maíz en temporada seca?" maxlength="500"></textarea>
+        <button type="submit" id="preguntar" class="boton" disabled>Preguntar</button>
+        <p id="estado-pregunta" class="estado" role="status"></p>
+      </form>
+    </section>
+
+    <p class="aviso">El análisis y las respuestas son de apoyo: quien las usa decide en campo. El servicio de inteligencia artificial todavía no está conectado.</p>
+  </main>
+
+  <script>
+    (function () {
+      var PENDIENTE = 'El servicio de inteligencia artificial todavía no está conectado. Cuando se conecte, aquí aparecerá el resultado.';
+      var foto = document.getElementById('foto');
+      var vista = document.getElementById('vista');
+      var analizar = document.getElementById('analizar');
+      var estadoFoto = document.getElementById('estado-foto');
+      var pregunta = document.getElementById('pregunta');
+      var preguntar = document.getElementById('preguntar');
+      var estadoPregunta = document.getElementById('estado-pregunta');
+      var url = null;
+
+      foto.addEventListener('change', function () {
+        var archivo = foto.files && foto.files[0];
+        if (url) { URL.revokeObjectURL(url); url = null; }
+        if (!archivo) { vista.hidden = true; analizar.disabled = true; return; }
+        url = URL.createObjectURL(archivo);
+        vista.src = url; vista.hidden = false; analizar.disabled = false; estadoFoto.textContent = '';
+      });
+      document.getElementById('form-foto').addEventListener('submit', function (e) {
+        e.preventDefault(); estadoFoto.textContent = PENDIENTE;
+      });
+
+      pregunta.addEventListener('input', function () { preguntar.disabled = pregunta.value.trim().length === 0; });
+      document.getElementById('form-pregunta').addEventListener('submit', function (e) {
+        e.preventDefault(); estadoPregunta.textContent = PENDIENTE;
+      });
+    })();
+  </script>
+</body>
+</html>

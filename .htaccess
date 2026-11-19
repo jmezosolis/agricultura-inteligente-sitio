@@ -1,0 +1,22 @@
+# Mismo problema y misma solución que frontend/ganadero/.htaccess y
+# frontend/administracion/.htaccess (leer el comentario ahí para el
+# diagnóstico completo): el CDN propio de Hostinger sirve por defecto
+# "Cache-Control: public, max-age=604800" (7 días) para cualquier
+# archivo estático, así que aunque subas una carpeta nueva el navegador
+# y el CDN pueden seguir mostrando la copia vieja de index.html/inicio.js
+# hasta una semana — a esta carpeta raíz (la landing de acceso,
+# compartida entre las 2 apps) le faltaba este archivo por completo,
+# a diferencia de ganadero/ y administracion/, que ya lo tenían.
+#
+# Los íconos (.png de acá mismo, usados por las 2 apps) quedan afuera a
+# propósito, igual que en los otros 2 .htaccess — cambian poco y conviene
+# que el CDN los cachee fuerte. Cuando SÍ hace falta reemplazar uno (por
+# ejemplo el logo del login), la forma de saltarse el caché sin esperar
+# los 7 días es referenciarlo con "?v=" en el <img src="...">
+# (ver inicio.js) y subir ese número cada vez — como el CACHE_NAME de
+# sw.js, es la misma idea aplicada a una imagen suelta.
+<IfModule mod_headers.c>
+  <FilesMatch "^(index\.html|inicio\.js)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

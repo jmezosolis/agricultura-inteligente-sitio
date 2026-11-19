@@ -1,0 +1,18 @@
+# Mismo motivo que frontend/ganadero/.htaccess: sin esto, tanto el
+# navegador de cada visitante como el CDN de Hostinger pueden quedarse con
+# una copia vieja de estos archivos hasta 7 días después de subir una
+# corrección (confirmado con Planificador de Potreros y con Ganadero).
+# Acá pega distinto: index.html es donde vive el <style> que pisa los
+# bordes de "theme-bw" a negro puro (ver el comentario ahí) — una copia
+# vieja cacheada muestra el login con los bordes dorados de shared/styles.css
+# en vez de los negros propios de Administración, aunque la URL sea la
+# correcta.
+#
+# administracion/ no tiene app.js ni styles.css propios (usa los de
+# shared/, que ya están cubiertos por shared/.htaccess) — por eso acá solo
+# hace falta sw.js e index.html.
+<IfModule mod_headers.c>
+  <FilesMatch "^(sw\.js|index\.html)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

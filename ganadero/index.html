@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Gana ID — Ganadero</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0F2A4A">
+<!-- Ícono de la pestaña del navegador — sin esto el navegador muestra
+     uno genérico (el "mundito") en vez del logo real; el manifest.json y
+     apple-touch-icon de abajo son para la instalación como app, no
+     alcanzan para la pestaña normal. -->
+<link rel="icon" href="./icon-192.png?v=2" type="image/png">
+<link rel="apple-touch-icon" href="./icon-192.png?v=2">
+<!-- iOS/Safari casi ignora manifest.json — sin estos metatags, "Agregar a
+     pantalla de inicio" abre en Safari normal (con su barra) en vez del
+     modo standalone del ícono, y usa el <title> completo en vez de uno
+     corto debajo del ícono. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Gana ID">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./tienda.css">
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<div id="app"></div>
+<script>const APP_SCOPE = 'ganadero';</script>
+<!-- Cliente de Supabase + sesión real (Auth) — shared/data.js ya usa esto
+     para login/registro/logout; el resto de los datos (animales, eventos,
+     etc.) sigue con localStorage/mockApi por ahora. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../supabase-config.js"></script>
+<script src="../shared/supabase-client.js"></script>
+<script src="../shared/auth-supabase.js"></script>
+<script src="../shared/data.js"></script>
+<script src="../shared/ui-common.js"></script>
+<script src="./tienda-data.js"></script>
+<script src="./tienda.js"></script>
+<script src="./connection-status.js"></script>
+<script src="./app.js"></script>
+<script src="../shared/instalar.js"></script>
+<script src="../shared/push.js"></script>
+</body>
+</html>
