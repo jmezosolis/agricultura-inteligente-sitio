@@ -42,16 +42,6 @@
   </header>
 
   <main>
-    <section class="tarjeta" id="acceso" hidden>
-      <h2>Inicia sesión para usar la detección</h2>
-      <p class="suave">Usa tu cuenta de Agricultura inteligente. Con la misma cuenta funcionan las tres apps.</p>
-      <form id="form-acceso" style="display:grid;gap:10px">
-        <input id="acceso-correo" type="email" placeholder="Correo" required style="padding:10px;border-radius:10px;border:1px solid #2A3B5C;background:#0A1020;color:#E2E8F0">
-        <input id="acceso-clave" type="password" placeholder="Contraseña" required style="padding:10px;border-radius:10px;border:1px solid #2A3B5C;background:#0A1020;color:#E2E8F0">
-        <button type="submit" class="boton">Entrar</button>
-        <p id="acceso-estado" class="estado" role="status"></p>
-      </form>
-    </section>
     <section class="tarjeta" aria-labelledby="t-detectar">
       <h2 id="t-detectar">Detecta plantas y enfermedades</h2>
       <p class="suave">Sube una foto de la planta o de la hoja afectada y la analizaremos con inteligencia artificial.</p>
@@ -84,33 +74,6 @@
     <p class="aviso">El análisis y las respuestas son de apoyo: quien las usa decide en campo. El servicio de inteligencia artificial todavía no está conectado.</p>
   </main>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm';
-    const supa = createClient('https://krmzykgzmcgnjvsicaaq.supabase.co', document.querySelector('meta[name="supabase-key"]').content);
-    const seccion = document.getElementById('acceso');
-    const formulario = document.getElementById('form-acceso');
-    const estado = document.getElementById('acceso-estado');
-    const botones = ['analizar', 'preguntar'].map((id) => document.getElementById(id));
-    async function revisar() {
-      const { data: { session } } = await supa.auth.getSession();
-      seccion.hidden = !!session;
-      window.__sesionActiva = !!session;
-      if (!session) botones.forEach((b) => { b.disabled = true; });
-    }
-    formulario.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      estado.textContent = 'Entrando…';
-      const { error } = await supa.auth.signInWithPassword({
-        email: document.getElementById('acceso-correo').value.trim(),
-        password: document.getElementById('acceso-clave').value,
-      });
-      if (error) { estado.textContent = 'Correo o contraseña incorrectos.'; return; }
-      estado.textContent = '';
-      seccion.hidden = true;
-      window.__sesionActiva = true;
-    });
-    revisar();
-  </script>
   <script>
     (function () {
       var URL_FUNCION = 'https://krmzykgzmcgnjvsicaaq.supabase.co/functions/v1/ia-analisis';
@@ -166,7 +129,7 @@
         if (url) { URL.revokeObjectURL(url); url = null; }
         if (!archivo) { vista.hidden = true; analizar.disabled = true; return; }
         url = URL.createObjectURL(archivo);
-        vista.src = url; vista.hidden = false; analizar.disabled = !window.__sesionActiva; estadoFoto.textContent = '';
+        vista.src = url; vista.hidden = false; analizar.disabled = false; estadoFoto.textContent = '';
       });
 
       document.getElementById('form-foto').addEventListener('submit', function (e) {
@@ -188,7 +151,7 @@
         }).finally(function () { analizar.disabled = false; });
       });
 
-      pregunta.addEventListener('input', function () { preguntar.disabled = !window.__sesionActiva || pregunta.value.trim().length === 0; });
+      pregunta.addEventListener('input', function () { preguntar.disabled = pregunta.value.trim().length === 0; });
 
       document.getElementById('form-pregunta').addEventListener('submit', function (e) {
         e.preventDefault();
@@ -200,7 +163,7 @@
           pintar(resultado, datos.respuesta || '');
         }).catch(function () {
           estadoPregunta.textContent = 'No pudimos responder. Intenta de nuevo más tarde.';
-        }).finally(function () { preguntar.disabled = !window.__sesionActiva || pregunta.value.trim().length === 0; });
+        }).finally(function () { preguntar.disabled = pregunta.value.trim().length === 0; });
       });
     })();
   </script>
