@@ -36,6 +36,11 @@
     html, body { overflow-x: hidden; }
     main { grid-template-columns: minmax(0, 1fr); }
     main > *, .tarjeta, textarea, input, button { min-width: 0; max-width: 100%; }
+    .tarjeta { grid-template-columns: minmax(0, 1fr); }
+    .tarjeta > *, form, fieldset, label, input, select, textarea, button { min-width: 0; max-width: 100%; box-sizing: border-box; }
+    input[type="file"] { width: 100%; }
+    fieldset { width: 100%; flex-wrap: wrap; margin: 0; padding-inline: 12px; box-sizing: border-box; }
+    .identificar-carga, label.carga { overflow: hidden; }
   </style>
 </head>
 <body>
