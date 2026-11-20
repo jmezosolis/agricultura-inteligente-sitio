@@ -32,6 +32,10 @@
     textarea { width: 100%; min-height: 96px; background: #0A1020; color: var(--texto); border: 1px solid #2A3B5C; border-radius: 12px; padding: 12px; font: inherit; resize: vertical; }
     .estado { color: var(--texto-suave); font-size: 14px; min-height: 1.4em; margin: 0; }
     .aviso { font-size: 12px; color: var(--texto-suave); }
+      /* Sin desplazamiento horizontal en celular */
+    html, body { overflow-x: hidden; }
+    main { grid-template-columns: minmax(0, 1fr); }
+    main > *, .tarjeta, textarea, input, button { min-width: 0; max-width: 100%; }
   </style>
 </head>
 <body>

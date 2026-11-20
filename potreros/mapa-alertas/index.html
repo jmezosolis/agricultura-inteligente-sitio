@@ -28,6 +28,13 @@
     .alerta.alta { border-left-color: var(--rojo); }
     .alerta.ok { border-left-color: var(--neon); }
     .aviso { font-size: 12px; color: var(--texto-suave); }
+    .mk { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #FFFFFF; box-shadow: 0 3px 10px rgba(0,0,0,.45); display: grid; place-items: center; }
+    .mk svg { width: 18px; height: 18px; stroke: #FFFFFF; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .indice summary { cursor: pointer; font-weight: 600; color: #E2E8F0; }
+    .indice ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 10px; font-size: 14px; color: #CBD5E1; }
+    .indice li { display: flex; gap: 10px; align-items: flex-start; }
+    .indice li .mk { width: 28px; height: 28px; flex: none; }
+    .indice li .mk svg { width: 15px; height: 15px; }
   </style>
 </head>
 <body>
@@ -43,7 +50,7 @@
     <div class="capas" role="group" aria-label="Capas del mapa">
       <button type="button" data-base="satelite" aria-pressed="true">Satélite</button>
       <button type="button" data-base="calles" aria-pressed="false">Calles</button>
-      <button type="button" id="simular" aria-pressed="false">Simular eventos</button>
+      <button type="button" id="limpiar">Limpiar mapa</button>
       <button type="button" id="nacional" aria-pressed="false">Vista nacional</button>
     </div>
 
@@ -56,6 +63,19 @@
         <button type="submit" style="padding:12px;border-radius:12px;border:0;background:#00FF9D;color:#03130C;font-weight:700">Entrar</button>
         <p id="acceso-estado" class="aviso" role="status"></p>
       </form>
+    </section>
+
+    <section class="tarjeta" id="leyenda" aria-label="Índice de elementos del mapa">
+      <details class="indice" open>
+        <summary>Índice de elementos del mapa</summary>
+        <ul>
+          <li><span class="mk" style="background:#F97316"><svg viewBox="0 0 24 24"><path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/></svg></span><span><strong>Ola de calor:</strong> máxima de 35 °C o más en los próximos 3 días.</span></li>
+          <li><span class="mk" style="background:#38BDF8"><svg viewBox="0 0 24 24"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg></span><span><strong>Helada:</strong> mínima de 2 °C o menos. Riesgo para cultivos sensibles.</span></li>
+          <li><span class="mk" style="background:#6366F1"><svg viewBox="0 0 24 24"><path d="M12 3s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/></svg></span><span><strong>Lluvia intensa:</strong> 30 mm o más en un día. Riesgo de encharcamiento.</span></li>
+          <li><span class="mk" style="background:#64748B"><svg viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/></svg></span><span><strong>Viento fuerte:</strong> 50 km/h o más. Puede dañar plantas.</span></li>
+          <li><span class="mk" style="background:#DC2626"><svg viewBox="0 0 24 24"><path d="M12 3c1 3 4 5 4 9a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-8z"/></svg></span><span><strong>Foco de calor:</strong> detección satelital (requiere inicio de sesión).</span></li>
+        </ul>
+      </details>
     </section>
 
     <section class="tarjeta" id="resumen">
@@ -178,53 +198,19 @@
       alertasEl.innerHTML = bloques.join('');
     });
 
-    // Simulación de eventos (datos de ejemplo, no reales)
-    const capaSimulada = L.layerGroup();
-    const EVENTOS_SIMULADOS = [
-      { dlat: 0.090, dlng: -0.120, tipo: 'Foco de calor', color: '#DC2626', significa: 'Detección satelital de fuego o calor intenso en un radio de 5 km.' },
-      { dlat: -0.060, dlng: 0.140, tipo: 'Foco de calor', color: '#DC2626', significa: 'Detección satelital de fuego o calor intenso en un radio de 5 km.' },
-      { dlat: 0.160, dlng: 0.060, tipo: 'Ola de calor', color: '#F97316', significa: 'Temperatura máxima de 35 °C o más en los próximos días.' },
-      { dlat: -0.150, dlng: -0.110, tipo: 'Helada', color: '#38BDF8', significa: 'Temperatura mínima de 2 °C o menos. Riesgo para cultivos sensibles.' },
-      { dlat: 0.020, dlng: 0.200, tipo: 'Lluvia intensa', color: '#6366F1', significa: 'Lluvia de 30 mm o más en un día. Riesgo de encharcamiento.' },
-      { dlat: -0.110, dlng: 0.030, tipo: 'Viento fuerte', color: '#64748B', significa: 'Vientos de 50 km/h o más. Puede tirar plantas y dañar hojas.' },
-      { dlat: 0.120, dlng: -0.040, tipo: 'Tormenta o huracán', color: '#DB2777', significa: 'Sistema ciclónico con vientos de 63 km/h o más (tormenta tropical; huracán desde 119 km/h).' },
-      { dlat: -0.040, dlng: -0.200, tipo: 'Inundación', color: '#0D9488', significa: 'Agua acumulada en zonas bajas por lluvia intensa o desbordamiento.' },
-      { dlat: 0.050, dlng: 0.250, tipo: 'Tráfico o bloqueo', color: '#FACC15', significa: 'Cierre o congestión en una vía de acceso a tu zona.' },
-    ];
-
-    function leyenda() {
-      const filas = EVENTOS_SIMULADOS.filter((ev, i, arr) => arr.findIndex((x) => x.tipo === ev.tipo) === i)
-        .map((ev) => '<li><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:' + ev.color + ';margin-right:8px;border:1px solid #fff"></span><strong>' + ev.tipo + ':</strong> ' + ev.significa + '</li>')
-        .join('');
-      return '<h2>Simulación activa</h2><p class="aviso">Eventos de ejemplo, no reales. Toca un punto para ver su detalle.</p><ul style="list-style:none;padding:0;margin:8px 0 0;display:grid;gap:8px;font-size:14px;color:#CBD5E1">' + filas + '</ul>';
-    }
-
-    const botonSimular = document.getElementById('simular');
-    botonSimular.addEventListener('click', () => {
-      const activa = botonSimular.getAttribute('aria-pressed') === 'true';
-      if (activa) {
-        mapa.removeLayer(capaSimulada);
-        capaSimulada.clearLayers();
-        botonSimular.setAttribute('aria-pressed', 'false');
-        botonSimular.textContent = 'Simular eventos';
-        resumen.innerHTML = '<h2>Toca el mapa para consultar una zona</h2><p>Se revisan los incendios cercanos (radio de 5 km) y el clima de los próximos 3 días en el punto que elijas.</p>';
-        return;
-      }
-      const centro = mapa.getCenter();
-      mapa.setView(centro, 8);
-      EVENTOS_SIMULADOS.forEach((ev) => {
-        L.circleMarker([centro.lat + ev.dlat, centro.lng + ev.dlng], { radius: 9, color: '#FFFFFF', weight: 2, fillColor: ev.color, fillOpacity: 0.95 })
-          .bindPopup('<strong>' + ev.tipo + '</strong><br>' + ev.significa + '<br><em>Simulación: datos de ejemplo.</em>')
-          .addTo(capaSimulada);
-      });
-      capaSimulada.addTo(mapa);
-      botonSimular.setAttribute('aria-pressed', 'true');
-      botonSimular.textContent = 'Ocultar simulación';
-      resumen.innerHTML = leyenda();
-    });
-
     // Vista nacional: clima en una cuadrícula de México (cada 1°), solo puntos con alerta
     const capaNacional = L.layerGroup();
+    const ICONOS = {
+      'Ola de calor': { color: '#F97316', ruta: '<path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/>' },
+      'Helada': { color: '#38BDF8', ruta: '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/>' },
+      'Lluvia intensa': { color: '#6366F1', ruta: '<path d="M12 3s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/>' },
+      'Viento fuerte': { color: '#64748B', ruta: '<path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/>' },
+    };
+    function iconoDe(tipo) {
+      const ic = ICONOS[tipo];
+      return L.divIcon({ className: '', iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -14],
+        html: '<div class="mk" style="background:' + ic.color + '"><svg viewBox="0 0 24 24">' + ic.ruta + '</svg></div>' });
+    }
     const botonNacional = document.getElementById('nacional');
     const UMBRALES = [
       { campo: 'max', min: 35, tipo: 'Ola de calor', color: '#F97316', unidad: '°C' },
@@ -307,7 +293,7 @@
             const p = bloque[k];
             const principal = hallazgos[0];
             hallazgos.forEach((h) => { conteo[h.tipo] = (conteo[h.tipo] || 0) + 1; });
-            L.circleMarker([p.lat, p.lon], { radius: 6, color: '#FFFFFF', weight: 1.5, fillColor: principal.color, fillOpacity: 0.95 })
+            L.marker([p.lat, p.lon], { icon: iconoDe(principal.tipo) })
               .bindPopup('<strong>' + principal.tipo + '</strong><br>' + hallazgos.map((h) => escapar(h.texto)).join('<br>') + '<br><em>Pronóstico de Open-Meteo. No sustituye avisos oficiales.</em>')
               .addTo(capaNacional);
           });
@@ -323,6 +309,15 @@
       } finally {
         botonNacional.disabled = false;
       }
+    });
+
+    document.getElementById('limpiar').addEventListener('click', () => {
+      if (marca) { mapa.removeLayer(marca); marca = null; }
+      mapa.removeLayer(capaNacional);
+      capaNacional.clearLayers();
+      botonNacional.setAttribute('aria-pressed', 'false');
+      botonNacional.textContent = 'Vista nacional';
+      resumen.innerHTML = '<h2>Toca el mapa para consultar una zona</h2><p>Se revisan los incendios cercanos (radio de 5 km) y el clima de los próximos 3 días en el punto que elijas.</p>';
     });
 
     document.getElementById('ubicarme').addEventListener('click', () => {
