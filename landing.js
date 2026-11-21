@@ -199,7 +199,7 @@ function pintarSeccionApps(session) {
   cont.innerHTML = `
     <div class="apps-grid">
       <article class="app-tarjeta">
-        <span class="app-icono-combo" aria-hidden="true"><img class="base" src="assets/cesped.png" alt=""><img class="base2" src="assets/cesped.png" alt=""><img class="sat" src="assets/satelite.webp" alt=""><img class="maiz b1" src="assets/maiz-cultivo.gif" alt=""></span>
+        <span class="app-icono-combo" aria-hidden="true"><img class="base" src="assets/cesped.png" alt=""><img class="base2" src="assets/cesped.png" alt=""><img class="sat" src="assets/satelite.webp" alt=""></span>
         <h3>Agricultura inteligente</h3>
         <p class="app-subtitulo">Monitoreo de cultivos</p>
         <ul>
