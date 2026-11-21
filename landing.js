@@ -241,6 +241,7 @@ function pintarSeccionApps(session) {
         </ul>
       </article>
       <article class="app-tarjeta">
+        <img class="app-icono-img" src="assets/icono-ia-blanco.png" alt="" aria-hidden="true">
         <h3>Detección con IA</h3>
         <p class="app-subtitulo">Plantas, enfermedades y preguntas</p>
         <ul>
@@ -249,11 +250,21 @@ function pintarSeccionApps(session) {
         </ul>
       </article>
       <article class="app-tarjeta">
+        <img class="app-icono-img" src="assets/icono-mapa.png" alt="" aria-hidden="true">
         <h3>Mapa de alertas</h3>
         <p class="app-subtitulo">Clima y vista satelital</p>
         <ul>
           <li>Olas de calor, heladas, lluvia intensa y viento fuerte</li>
           <li>Vista satelital y calles en un solo mapa</li>
+        </ul>
+      </article>
+      <article class="app-tarjeta">
+        <img class="app-icono-img" src="assets/icono-inventario.png" alt="" aria-hidden="true">
+        <h3>Inventario de insumos</h3>
+        <p class="app-subtitulo">Agroquímicos y fertilizantes con código de barras</p>
+        <ul>
+          <li>Registra cada producto escaneando su código de barras</li>
+          <li>Descuenta lo aplicado a cada cultivo y lleva el stock</li>
         </ul>
       </article>
     </div>
