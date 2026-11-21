@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070A11">
+  <meta name="description" content="Inventario de agroquímicos y fertilizantes, con lectura de código de barras y registro de aplicaciones por cultivo.">
+  <title>Inventario de insumos</title>
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+  <style>
+    :root { --fondo: #070A11; --tarjeta: #0D1322; --borde: #1E293B; --neon: #00FF9D; --texto: #E2E8F0; --suave: #94A3B8; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--fondo); color: var(--texto); font-family: Inter, system-ui, sans-serif; overflow-x: hidden; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; background: #0D1322; border-bottom: 1px solid var(--borde); }
+    header a { color: #fff; background: #111A2E; border: 1px solid #2A3B5C; border-radius: 10px; padding: 8px 12px; text-decoration: none; font-size: 14px; font-weight: 600; }
+    header h1 { font-size: 17px; margin: 0; }
+    main { max-width: 640px; margin: 0 auto; padding: 16px; display: grid; gap: 14px; min-width: 0; }
+    .tarjeta { background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 14px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+    .tarjeta h2 { font-size: 17px; margin: 0; }
+    .suave { color: var(--suave); font-size: 14px; line-height: 1.5; margin: 0; }
+    input, select { width: 100%; padding: 11px; border-radius: 10px; border: 1px solid #2A3B5C; background: #0A1020; color: var(--texto); font: inherit; min-width: 0; }
+    button { padding: 12px; border-radius: 12px; border: 0; background: var(--neon); color: #03130C; font-weight: 700; font-size: 15px; cursor: pointer; }
+    button.secundario { background: #111A2E; color: var(--texto); border: 1px solid #2A3B5C; }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    video { width: 100%; max-height: 280px; border-radius: 12px; background: #000; }
+    .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+    li { background: #0A1020; border: 1px solid var(--borde); border-radius: 10px; padding: 10px 12px; font-size: 14px; display: flex; justify-content: space-between; gap: 10px; }
+    .estado { font-size: 14px; color: var(--suave); min-height: 1.4em; margin: 0; }
+    .aviso { font-size: 12px; color: var(--suave); }
+    .oculto { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../index.html">← Agricultura</a>
+    <h1>Inventario de insumos</h1>
+    <span></span>
+  </header>
+
+  <main>
+    <section class="tarjeta" id="acceso">
+      <h2>Inicia sesión</h2>
+      <p class="suave">Usa tu cuenta de Agricultura inteligente para guardar tu inventario.</p>
+      <form id="form-acceso" style="display:grid;gap:10px">
+        <input id="acceso-correo" type="email" placeholder="Correo" required>
+        <input id="acceso-clave" type="password" placeholder="Contraseña" required>
+        <button type="submit">Entrar</button>
+        <p id="acceso-estado" class="estado" role="status"></p>
+      </form>
+    </section>
+
+    <section class="tarjeta oculto" id="panel">
+      <h2>Escanear código de barras</h2>
+      <p class="suave">Apunta la cámara al código del envase, o escríbelo a mano.</p>
+      <video id="camara" playsinline muted class="oculto"></video>
+      <div class="fila">
+        <button type="button" id="iniciar-camara" class="secundario">Usar cámara</button>
+        <button type="button" id="detener-camara" class="secundario oculto">Detener</button>
+      </div>
+      <input id="codigo" inputmode="numeric" placeholder="Código de barras">
+      <p id="estado-escaneo" class="estado" role="status"></p>
+    </section>
+
+    <section class="tarjeta oculto" id="nuevo-insumo">
+      <h2>Nuevo insumo</h2>
+      <form id="form-insumo" style="display:grid;gap:10px">
+        <input id="ins-nombre" placeholder="Nombre del producto" required>
+        <select id="ins-tipo">
+          <option value="agroquimico">Agroquímico</option>
+          <option value="fertilizante">Fertilizante</option>
+          <option value="semilla">Semilla</option>
+          <option value="otro">Otro</option>
+        </select>
+        <div class="fila">
+          <input id="ins-unidad" placeholder="Unidad (L, kg, bolsa)" value="L" required>
+          <input id="ins-stock" type="number" min="0" step="any" placeholder="Stock inicial" required>
+        </div>
+        <button type="submit">Guardar insumo</button>
+      </form>
+    </section>
+
+    <section class="tarjeta oculto" id="aplicar">
+      <h2>Registrar aplicación</h2>
+      <form id="form-aplicacion" style="display:grid;gap:10px">
+        <select id="app-insumo" required></select>
+        <div class="fila">
+          <input id="app-cantidad" type="number" min="0" step="any" placeholder="Cantidad aplicada" required>
+          <input id="app-fecha" type="date" required>
+        </div>
+        <input id="app-cultivo" placeholder="Cultivo o lote (ej. maíz, lote norte)">
+        <input id="app-nota" placeholder="Nota (opcional)">
+        <button type="submit">Registrar y descontar del stock</button>
+        <p id="estado-aplicacion" class="estado" role="status"></p>
+      </form>
+    </section>
+
+    <section class="tarjeta oculto" id="stock">
+      <h2>Stock actual</h2>
+      <ul id="lista-stock"></ul>
+    </section>
+
+    <section class="tarjeta oculto" id="historial">
+      <h2>Últimas aplicaciones</h2>
+      <ul id="lista-aplicaciones"></ul>
+    </section>
+
+    <p class="aviso">Las cantidades son un registro de tu inventario. Sigue la etiqueta del producto y las recomendaciones de un técnico.</p>
+  </main>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm';
+    const URL_PROYECTO = 'https://krmzykgzmcgnjvsicaaq.supabase.co';
+    const CLAVE_PUBLICA = 'sb_publishable_bXIMHv6T-mVyyswqv1NL1Q_tD-ghmNl';
+    const supa = createClient(URL_PROYECTO, CLAVE_PUBLICA);
+
+    const $ = (id) => document.getElementById(id);
+    const escapar = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    let insumos = [];
+    let flujo = null;
+
+    function mostrarPanel(activo) {
+      ['panel', 'nuevo-insumo', 'aplicar', 'stock', 'historial'].forEach((id) => $(id).classList.toggle('oculto', !activo));
+    }
+
+    async function cargar() {
+      const [a, b] = await Promise.all([
+        supa.from('insumos').select('id, codigo, nombre, tipo, unidad, stock').order('nombre'),
+        supa.from('aplicaciones').select('id, cantidad, fecha, cultivo, nota, insumos(nombre, unidad)').order('creado', { ascending: false }).limit(20),
+      ]);
+      if (a.error || b.error) { $('estado-escaneo').textContent = 'No se pudo cargar el inventario. Revisa tu sesión.'; return; }
+      insumos = a.data;
+      $('app-insumo').innerHTML = insumos.map((i) => '<option value="' + i.id + '">' + escapar(i.nombre) + ' (' + i.stock + ' ' + escapar(i.unidad) + ')</option>').join('');
+      $('lista-stock').innerHTML = insumos.map((i) => '<li><span><strong>' + escapar(i.nombre) + '</strong><br><small>' + escapar(i.tipo) + ' · código ' + escapar(i.codigo) + '</small></span><span>' + i.stock + ' ' + escapar(i.unidad) + '</span></li>').join('') || '<li>Aún no tienes insumos.</li>';
+      $('lista-aplicaciones').innerHTML = b.data.map((r) => '<li><span><strong>' + escapar(r.insumos?.nombre) + '</strong><br><small>' + escapar(r.cultivo || 'Sin cultivo') + ' · ' + r.fecha + '</small></span><span>' + r.cantidad + ' ' + escapar(r.insumos?.unidad) + '</span></li>').join('') || '<li>Sin aplicaciones registradas.</li>';
+      $('app-fecha').value = new Date().toISOString().slice(0, 10);
+    }
+
+    // Buscar un insumo por código; si no existe, se pide darlo de alta
+    function buscarCodigo(codigo) {
+      codigo = codigo.trim();
+      if (!codigo) return;
+      const encontrado = insumos.find((i) => i.codigo === codigo);
+      if (encontrado) {
+        $('estado-escaneo').textContent = 'Encontrado: ' + encontrado.nombre + ' (stock ' + encontrado.stock + ' ' + encontrado.unidad + ').';
+        $('app-insumo').value = encontrado.id;
+        $('nuevo-insumo').classList.add('oculto');
+      } else {
+        $('estado-escaneo').textContent = 'Código nuevo. Registra el producto abajo.';
+        $('nuevo-insumo').dataset.codigo = codigo;
+        $('nuevo-insumo').classList.remove('oculto');
+      }
+    }
+
+    $('codigo').addEventListener('change', (e) => buscarCodigo(e.target.value));
+    $('codigo').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); buscarCodigo(e.target.value); } });
+
+    // Cámara con BarcodeDetector (Chrome en Android); si no existe, se escribe el código
+    $('iniciar-camara').addEventListener('click', async () => {
+      if (!('BarcodeDetector' in window)) { $('estado-escaneo').textContent = 'Este navegador no lee códigos con cámara. Escribe el código a mano.'; return; }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        const video = $('camara');
+        video.srcObject = stream; video.classList.remove('oculto'); await video.play();
+        $('iniciar-camara').classList.add('oculto'); $('detener-camara').classList.remove('oculto');
+        const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code'] });
+        flujo = setInterval(async () => {
+          const codigos = await detector.detect(video).catch(() => []);
+          if (codigos.length) {
+            $('codigo').value = codigos[0].rawValue;
+            detenerCamara();
+            buscarCodigo(codigos[0].rawValue);
+          }
+        }, 500);
+      } catch (err) {
+        $('estado-escaneo').textContent = 'No se pudo abrir la cámara. Escribe el código a mano.';
+      }
+    });
+    function detenerCamara() {
+      if (flujo) clearInterval(flujo);
+      const video = $('camara');
+      if (video.srcObject) video.srcObject.getTracks().forEach((t) => t.stop());
+      video.srcObject = null; video.classList.add('oculto');
+      $('iniciar-camara').classList.remove('oculto'); $('detener-camara').classList.add('oculto');
+    }
+    $('detener-camara').addEventListener('click', detenerCamara);
+
+    $('form-insumo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const codigo = $('nuevo-insumo').dataset.codigo || $('codigo').value.trim();
+      if (!codigo) { $('estado-escaneo').textContent = 'Primero escribe o escanea el código del producto.'; return; }
+      const { error } = await supa.from('insumos').insert({
+        codigo, nombre: $('ins-nombre').value.trim(), tipo: $('ins-tipo').value,
+        unidad: $('ins-unidad').value.trim() || 'L', stock: Number($('ins-stock').value) || 0,
+      });
+      if (error) { $('estado-escaneo').textContent = 'No se pudo guardar: ' + error.message; return; }
+      e.target.reset(); $('nuevo-insumo').classList.add('oculto');
+      $('estado-escaneo').textContent = 'Insumo guardado.';
+      await cargar();
+    });
+
+    $('form-aplicacion').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const insumo = insumos.find((i) => i.id === $('app-insumo').value);
+      const cantidad = Number($('app-cantidad').value);
+      if (!insumo || !(cantidad > 0)) return;
+      if (cantidad > insumo.stock) { $('estado-aplicacion').textContent = 'La cantidad supera el stock disponible (' + insumo.stock + ' ' + insumo.unidad + ').'; return; }
+      const { error } = await supa.from('aplicaciones').insert({
+        insumo_id: insumo.id, cantidad, fecha: $('app-fecha').value,
+        cultivo: $('app-cultivo').value.trim() || null, nota: $('app-nota').value.trim() || null,
+      });
+      if (error) { $('estado-aplicacion').textContent = 'No se pudo registrar: ' + error.message; return; }
+      const { error: errStock } = await supa.from('insumos').update({ stock: insumo.stock - cantidad }).eq('id', insumo.id);
+      if (errStock) { $('estado-aplicacion').textContent = 'Aplicación guardada, pero no se actualizó el stock.'; return; }
+      $('estado-aplicacion').textContent = 'Aplicación registrada.';
+      e.target.reset(); $('app-fecha').value = new Date().toISOString().slice(0, 10);
+      await cargar();
+    });
+
+    $('form-acceso').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      $('acceso-estado').textContent = 'Entrando…';
+      const { error } = await supa.auth.signInWithPassword({ email: $('acceso-correo').value.trim(), password: $('acceso-clave').value });
+      if (error) { $('acceso-estado').textContent = 'Correo o contraseña incorrectos.'; return; }
+      $('acceso').classList.add('oculto'); mostrarPanel(true); await cargar();
+    });
+
+    (async () => {
+      const { data: { session } } = await supa.auth.getSession();
+      if (session) { $('acceso').classList.add('oculto'); mostrarPanel(true); await cargar(); }
+      else mostrarPanel(false);
+    })();
+  </script>
+</body>
+</html>
