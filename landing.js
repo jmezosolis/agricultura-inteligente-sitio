@@ -199,7 +199,7 @@ function pintarSeccionApps(session) {
   cont.innerHTML = `
     <div class="apps-grid">
       <article class="app-tarjeta">
-        <img class="app-icono-img" src="assets/icono-campo-vivo.png" alt="" aria-hidden="true">
+        <span class="app-icono-combo" aria-hidden="true"><img class="base" src="assets/cesped.png" alt=""><img class="base2" src="assets/cesped.png" alt=""><img class="sat" src="assets/satelite.webp" alt=""><img class="maiz b1" src="assets/maiz-cultivo.gif" alt=""></span>
         <h3>Campo Vivo</h3>
         <p class="app-subtitulo">Monitoreo de cultivos</p>
         <ul>
