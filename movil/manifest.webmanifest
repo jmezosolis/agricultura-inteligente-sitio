@@ -1,7 +1,7 @@
 {
   "id": "/movil/",
-  "name": "Campo Vivo",
-  "short_name": "Campo Vivo",
+  "name": "Milpa Agricultura inteligente",
+  "short_name": "Milpa",
   "start_url": "./",
   "scope": "/",
   "display": "standalone",

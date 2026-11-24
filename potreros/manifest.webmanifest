@@ -1,6 +1,6 @@
 {
-  "name": "Campo Vivo — Monitoreo de cultivos",
-  "short_name": "Campo",
+  "name": "Milpa Agricultura inteligente — Monitoreo de cultivos",
+  "short_name": "Milpa",
   "start_url": "./",
   "scope": "/",
   "display": "standalone",
