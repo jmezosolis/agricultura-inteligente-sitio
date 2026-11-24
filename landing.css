@@ -1157,10 +1157,10 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
   .menu-btn-portal { flex: 0 0 auto; }
 }
 
-/* Icono de Agricultura inteligente: maíz animado sin fondo, centrado sobre el pasto */
+/* Icono de Campo Vivo: maíz animado sin fondo, centrado sobre el pasto */
 .app-icono-combo .base, .app-icono-combo .base2 { bottom: -16px; }
 
-/* Icono de Agricultura inteligente: 4 maíces animados sin fondo, en una fila inferior */
+/* Icono de Campo Vivo: 4 maíces animados sin fondo, en una fila inferior */
 .app-icono-combo .maiz { position: absolute; bottom: 0; width: 55%; height: auto; }
 .app-icono-combo .b1 { left: 0; }
 

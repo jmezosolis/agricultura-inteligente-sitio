@@ -1,4 +1,4 @@
-// Service worker de Agricultura inteligente. Solo hace que la app sea instalable.
+// Service worker de Campo Vivo. Solo hace que la app sea instalable.
 // No guarda ni intercepta respuestas: cada pantalla y cada dato vienen siempre de la red.
 // (Una versión anterior con caché dejaba la app en blanco al actualizar.)
 self.addEventListener('install', () => self.skipWaiting());

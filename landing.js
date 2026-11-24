@@ -1,12 +1,12 @@
 // =====================================================================
-// Portada única de "Agricultura inteligente".
+// Portada única de "Campo Vivo".
 //
 // Un solo login (Supabase, el mismo de Gana ID) sirve para las dos apps.
 // - Sin sesión: la portada muestra la información y el botón de
 //   "Iniciar sesión" / "Registrarse", que abren el mismo formulario de
 //   Gana ID (bloqueAccesoCuenta / bindAccesoCuenta de shared/ui-common.js).
 // - Con sesión: la portada muestra el selector de app. Gana ID entra según
-//   el rol (admin -> administracion/, ganadero -> ganadero/). Agricultura inteligente
+//   el rol (admin -> administracion/, ganadero -> ganadero/). Campo Vivo
 //   vive en potreros/ del mismo dominio, así que comparte la sesión.
 // =====================================================================
 
@@ -199,8 +199,8 @@ function pintarSeccionApps(session) {
   cont.innerHTML = `
     <div class="apps-grid">
       <article class="app-tarjeta">
-        <span class="app-icono-combo" aria-hidden="true"><img class="base" src="assets/cesped.png" alt=""><img class="base2" src="assets/cesped.png" alt=""><img class="sat" src="assets/satelite.webp" alt=""><img class="maiz b1" src="assets/maiz-cultivo.gif" alt=""></span>
-        <h3>Agricultura inteligente</h3>
+        <img class="app-icono-img" src="assets/icono-campo-vivo.png" alt="" aria-hidden="true">
+        <h3>Campo Vivo</h3>
         <p class="app-subtitulo">Monitoreo de cultivos</p>
         <ul>
           <li>Monitoreo de cultivos con imágenes satelitales</li>

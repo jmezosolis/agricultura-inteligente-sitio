@@ -1,6 +1,6 @@
 {
-  "name": "Agricultura inteligente — Monitoreo de cultivos",
-  "short_name": "Agricultura",
+  "name": "Campo Vivo — Monitoreo de cultivos",
+  "short_name": "Campo",
   "start_url": "./",
   "scope": "/",
   "display": "standalone",

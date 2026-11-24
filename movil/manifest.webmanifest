@@ -1,7 +1,7 @@
 {
   "id": "/movil/",
-  "name": "Agricultura inteligente",
-  "short_name": "Ganadería",
+  "name": "Campo Vivo",
+  "short_name": "Campo Vivo",
   "start_url": "./",
   "scope": "/",
   "display": "standalone",
