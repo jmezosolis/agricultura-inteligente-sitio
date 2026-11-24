@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#070A11">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Milpa Agricultura inteligente</title>
+  <title>Milpa Agricultura Inteligente</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="64x64" href="./favicon.png">
   <link rel="apple-touch-icon" href="./icon-192.png">
@@ -53,7 +53,7 @@
     .instalar.visible { display: block; }
     /* Iconos de color: el propio icono sirve de máscara */
     .mascara { display: block; width: 30px; height: 30px; background: var(--c); -webkit-mask: var(--img) center / contain no-repeat; mask: var(--img) center / contain no-repeat; }
-    /* Milpa Agricultura inteligente: dos pastos abajo y el satélite blanco girado */
+    /* Milpa Agricultura Inteligente: dos pastos abajo y el satélite blanco girado */
     .boton-app .ico .combo-ganader { position: relative; display: block; width: 36px; height: 36px; }
     .boton-app .ico .combo-ganader .base { position: absolute; left: 0; bottom: -8px; top: auto; width: 56%; height: auto; }
     .boton-app .ico .combo-ganader .base2 { position: absolute; right: 0; bottom: -8px; top: auto; width: 56%; height: auto; }
@@ -72,7 +72,7 @@
   <section id="pantalla-login" class="pantalla">
     <div class="marca">
       <img src="./icon-192.png" alt="">
-      <h1>Milpa Agricultura inteligente</h1>
+      <h1>Milpa Agricultura Inteligente</h1>
       <p>Inicia sesión para continuar</p>
     </div>
     <form id="form-login" class="campo-grupo" style="display:grid;gap:12px">
@@ -93,12 +93,12 @@
       <button type="button" id="abrir-config" class="engranaje" aria-label="Configuración"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
     <div class="marca">
-      <div id="avatar-actual" class="avatar-actual"><img src="./icon-192.png" alt=""></div>
-      <h1>Milpa Agricultura inteligente</h1>
+      <div id="avatar-actual" class="avatar-actual"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#111A2E"/><circle cx="50" cy="38" r="17" fill="#475569"/><path d="M22 100c3-20 15-30 28-30s25 10 28 30z" fill="#475569"/></svg></div>
+      <h1>Milpa Agricultura Inteligente</h1>
     </div>
     <p class="titulo">¿Qué necesitas hoy?</p>
     <div style="display:grid;gap:12px">
-      <a class="boton-app" href="../potreros/index.html"><span class="ico"><span class="combo-ganader" aria-hidden="true"><img class="base" src="../assets/cesped.png" alt=""><img class="base2" src="../assets/cesped.png" alt=""><img class="sat" src="../assets/satelite.webp" alt=""><img class="maiz b1" src="../assets/maiz-cultivo.gif" alt=""></span></span><span>Milpa Agricultura inteligente<small>Monitoreo de cultivos</small></span></a>
+      <a class="boton-app" href="../potreros/index.html"><span class="ico"><span class="combo-ganader" aria-hidden="true"><img class="base" src="../assets/cesped.png" alt=""><img class="base2" src="../assets/cesped.png" alt=""><img class="sat" src="../assets/satelite.webp" alt=""><img class="maiz b1" src="../assets/maiz-cultivo.gif" alt=""></span></span><span>Milpa Agricultura Inteligente<small>Monitoreo de cultivos</small></span></a>
       <a class="boton-app oculto" id="enlace-ganaid" href="../ganadero/index.html"><span class="ico"><img src="../assets/ganaid-icono-azul.png" alt=""></span><span>Gana ID<small>Trazabilidad con chip</small></span></a>
       <a class="boton-app oculto" href="../pesaje/index.html"><span class="ico"><img src="../assets/pesaje-icono-rojo.png" alt=""></span><span>Pesaje por imagen<small>Estimación de peso con cámara</small></span></a>
       <a class="boton-app oculto" href="../huella/index.html"><span class="ico"><img src="../assets/huella-icono-sostenible.png" alt=""></span><span>Huella de carbono<small>Metano y maquinaria del campo</small></span></a>
@@ -194,7 +194,7 @@
     const marcarAvatar = (valor) => {
       document.querySelectorAll('.avatar').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.avatar === valor)));
       const elegido = document.querySelector('.avatar[data-avatar="' + valor + '"] svg');
-      avatarActual.innerHTML = elegido ? elegido.outerHTML : '<img src="./icon-192.png" alt="">';
+      avatarActual.innerHTML = elegido ? elegido.outerHTML : '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#111A2E"/><circle cx="50" cy="38" r="17" fill="#475569"/><path d="M22 100c3-20 15-30 28-30s25 10 28 30z" fill="#475569"/></svg>';
     };
     try { marcarAvatar(localStorage.getItem(CLAVE_AVATAR) || ''); } catch (e) { /* almacenamiento bloqueado */ }
     document.querySelectorAll('.avatar').forEach((b) => b.addEventListener('click', () => {
