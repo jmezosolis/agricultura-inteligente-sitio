@@ -26,6 +26,13 @@
     .avatar svg { width: 100%; height: 100%; display: block; }
     .avatar[aria-checked="true"] { border-color: var(--neon); box-shadow: 0 0 0 3px rgba(0,255,157,0.25); }
     .avatar:focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
+    .cabecera { display: flex; justify-content: space-between; align-items: center; }
+    .engranaje { background: none; border: 1px solid var(--borde); border-radius: 12px; width: 44px; height: 44px; color: var(--texto); display: grid; place-items: center; cursor: pointer; padding: 0; }
+    .engranaje svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .texto-boton { background: none; border: 0; color: var(--texto-suave); font-size: 15px; cursor: pointer; padding: 8px 0; }
+    .subtitulo { margin: 0; text-align: center; color: var(--texto-suave); font-size: 14px; }
+    .avatar-actual { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; border: 3px solid var(--neon); box-shadow: 0 0 0 3px rgba(0,255,157,0.25); }
+    .avatar-actual svg, .avatar-actual img { width: 100%; height: 100%; display: block; }
     .titulo { margin: 8px 0 0; font-size: 18px; font-weight: 700; text-align: center; }
     .boton-app {
       display: flex; align-items: center; gap: 14px; width: 100%;
@@ -80,15 +87,12 @@
   </section>
 
   <section id="pantalla-apps" class="pantalla">
+    <div class="cabecera">
+      <span></span>
+      <button type="button" id="abrir-config" class="engranaje" aria-label="Configuración"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
     <div class="marca">
-      <div class="avatares" role="radiogroup" aria-label="Elige tu avatar">
-        <button type="button" class="avatar" data-avatar="femenino" role="radio" aria-checked="false" aria-label="Avatar femenino">
-          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#111A2E"/><path d="M50 16c-16 0-25 11-25 27v17c0 10 5 17 11 21h28c6-4 11-11 11-21V43c0-16-9-27-25-27z" fill="#3B2314"/><path d="M22 100c2-18 14-28 28-28s26 10 28 28z" fill="#1E7A5A"/><rect x="44" y="60" width="12" height="13" fill="#E0A77A"/><ellipse cx="50" cy="47" rx="15" ry="18" fill="#F1C7A0"/><path d="M34 45c1-14 8-22 16-22s15 8 16 22c-5-7-10-9-16-9s-11 2-16 9z" fill="#3B2314"/></svg>
-        </button>
-        <button type="button" class="avatar" data-avatar="masculino" role="radio" aria-checked="false" aria-label="Avatar masculino">
-          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#111A2E"/><path d="M20 100c3-18 15-28 30-28s27 10 30 28z" fill="#2F5D8A"/><rect x="44" y="60" width="12" height="13" fill="#E0A77A"/><ellipse cx="50" cy="47" rx="15" ry="17" fill="#F1C7A0"/><path d="M34 42c0-9 7-15 16-15s16 6 16 15c-4-4-9-6-16-6s-12 2-16 6z" fill="#2B1B10"/><ellipse cx="50" cy="31" rx="30" ry="6" fill="#C08A3E"/><path d="M36 31c0-11 6-16 14-16s14 5 14 16z" fill="#C08A3E"/></svg>
-        </button>
-      </div>
+      <div id="avatar-actual" class="avatar-actual"><img src="./icon-192.png" alt=""></div>
       <h1>Campo Vivo</h1>
     </div>
     <p class="titulo">¿Qué necesitas hoy?</p>
@@ -102,7 +106,24 @@
       <a class="boton-app" href="../potreros/inventario/index.html"><span class="ico"><img src="../assets/icono-inventario.png" alt=""></span><span>Inventario de insumos<small>Agroquímicos y fertilizantes con código de barras</small></span></a>
     </div>
     <button type="button" id="instalar" class="instalar">Instalar la app en mi celular</button>
-    <button type="button" id="salir" class="salir">Cerrar sesión</button>
+  </section>
+
+  <section id="pantalla-config" class="pantalla">
+    <div class="cabecera">
+      <button type="button" id="volver-config" class="texto-boton">← Volver</button>
+      <span></span>
+    </div>
+    <p class="titulo">Configuración</p>
+    <p class="subtitulo">Elige tu avatar</p>
+      <div class="avatares" role="radiogroup" aria-label="Elige tu avatar">
+        <button type="button" class="avatar" data-avatar="femenino" role="radio" aria-checked="false" aria-label="Avatar femenino">
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#111A2E"/><path d="M50 16c-16 0-25 11-25 27v17c0 10 5 17 11 21h28c6-4 11-11 11-21V43c0-16-9-27-25-27z" fill="#3B2314"/><path d="M22 100c2-18 14-28 28-28s26 10 28 28z" fill="#1E7A5A"/><rect x="44" y="60" width="12" height="13" fill="#E0A77A"/><ellipse cx="50" cy="47" rx="15" ry="18" fill="#F1C7A0"/><path d="M34 45c1-14 8-22 16-22s15 8 16 22c-5-7-10-9-16-9s-11 2-16 9z" fill="#3B2314"/></svg>
+        </button>
+        <button type="button" class="avatar" data-avatar="masculino" role="radio" aria-checked="false" aria-label="Avatar masculino">
+          <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#111A2E"/><path d="M20 100c3-18 15-28 30-28s27 10 30 28z" fill="#2F5D8A"/><rect x="44" y="60" width="12" height="13" fill="#E0A77A"/><ellipse cx="50" cy="47" rx="15" ry="17" fill="#F1C7A0"/><path d="M34 42c0-9 7-15 16-15s16 6 16 15c-4-4-9-6-16-6s-12 2-16 6z" fill="#2B1B10"/><ellipse cx="50" cy="31" rx="30" ry="6" fill="#C08A3E"/><path d="M36 31c0-11 6-16 14-16s14 5 14 16z" fill="#C08A3E"/></svg>
+        </button>
+      </div>
+      <button type="button" id="salir" class="salir">Cerrar sesión</button>
   </section>
 
   <script type="module">
@@ -168,14 +189,19 @@
 
     // Avatar: se recuerda en este navegador (preferencia local, no es un dato del servidor)
     const CLAVE_AVATAR = 'campo-vivo-avatar';
+    const avatarActual = document.getElementById('avatar-actual');
     const marcarAvatar = (valor) => {
       document.querySelectorAll('.avatar').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.avatar === valor)));
+      const elegido = document.querySelector('.avatar[data-avatar="' + valor + '"] svg');
+      avatarActual.innerHTML = elegido ? elegido.outerHTML : '<img src="./icon-192.png" alt="">';
     };
     try { marcarAvatar(localStorage.getItem(CLAVE_AVATAR) || ''); } catch (e) { /* almacenamiento bloqueado */ }
     document.querySelectorAll('.avatar').forEach((b) => b.addEventListener('click', () => {
       marcarAvatar(b.dataset.avatar);
       try { localStorage.setItem(CLAVE_AVATAR, b.dataset.avatar); } catch (e) { /* almacenamiento bloqueado */ }
     }));
+    document.getElementById('abrir-config').addEventListener('click', () => mostrar('pantalla-config'));
+    document.getElementById('volver-config').addEventListener('click', () => mostrar('pantalla-apps'));
 
     iniciar();
   </script>
