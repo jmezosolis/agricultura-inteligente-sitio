@@ -1026,7 +1026,7 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 }
 
 /* Sección Inicio: fondo blanco, letras azules, imagen a la derecha y texto a la izquierda */
-.inicio-claro { background: #ffffff; color: #0F2A4A; margin: 0 -16px; padding: 32px 16px 40px; }
+.inicio-claro { background: #ffffff; color: #0F2A4A; margin: 0 -16px; padding: 16px 16px 40px; }
 .inicio-claro .eyebrow { color: #1E6FB8; }
 .inicio-claro h1 { font-family: 'Archivo', system-ui, sans-serif; color: #0F2A4A; font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 14px; }
 .inicio-claro p, .inicio-claro li { color: #1E3A5F; }
@@ -1036,7 +1036,7 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 .inicio-imagen { margin: 0; text-align: center; }
 .inicio-imagen img { display: block; width: 100%; max-width: 300px; height: auto; margin: 0 auto; }
 @media (min-width: 760px) {
-  .inicio-caja { grid-template-columns: 1fr 320px; }
+  .inicio-caja { grid-template-columns: 1fr 320px; align-items: start; }
   .inicio-texto { order: 1; }
   .inicio-imagen { order: 2; }
 }
