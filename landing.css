@@ -1036,7 +1036,7 @@ main { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 .inicio-imagen { margin: 0; text-align: center; }
 .inicio-imagen img { display: block; width: 100%; max-width: 300px; height: auto; margin: 0 auto; }
 @media (min-width: 760px) {
-  .inicio-caja { grid-template-columns: 1fr 320px; align-items: start; }
+  .inicio-caja { grid-template-columns: 1fr 320px; align-items: center; }
   .inicio-texto { order: 1; }
   .inicio-imagen { order: 2; }
 }
